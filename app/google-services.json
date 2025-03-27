@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110272758633",
+    "project_id": "proyectofinalrallyfotografico",
+    "storage_bucket": "proyectofinalrallyfotografico.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110272758633:android:55bc83cc79fb9a761973f8",
+        "android_client_info": {
+          "package_name": "com.example.rallyfotografico"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCMsUvKfwes3ypesmVVcu1G_MIm3OlVkU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
