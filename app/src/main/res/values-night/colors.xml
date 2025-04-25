@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Colores principales en modo oscuro -->
+    <color name="colorPrimary">#BB86FC</color>
+    <color name="colorPrimaryVariant">#3700B3</color>
+    <color name="colorSecondary">#03DAC5</color>
+
+    <!-- Validaciones en modo oscuro -->
+    <color name="red">#EF9A9A</color>
+    <color name="green">#69F0AE</color>
+
+    <!-- Borde por defecto del EditText en modo oscuro -->
+    <color name="editTextStroke">#666666</color>
+
+    <!-- Fondo del formulario en modo oscuro -->
+    <color name="backgroundColor">#121212</color>
+
 </resources>

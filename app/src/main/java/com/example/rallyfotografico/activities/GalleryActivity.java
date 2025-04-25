@@ -18,10 +18,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Actividad que muestra una galería de fotografías que han sido "admitidas" por los administradores.
+ * Utiliza un RecyclerView para mostrar la lista y se conecta a Firebase Firestore para obtener los datos.
+ */
 public class GalleryActivity extends AppCompatActivity {
 
+    // Componentes de la interfaz
     private RecyclerView rvFotos;
     private TextView tvNoFotos;
+
+    // Firestore y datos
     private FirebaseFirestore db;
     private List<Foto> fotoList;
     private FotoAdapter fotoAdapter;
@@ -31,39 +38,42 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
-        // Inicializamos los elementos de la vista
+        // Inicializa elementos de la interfaz
         rvFotos = findViewById(R.id.rvFotos);
         tvNoFotos = findViewById(R.id.tvNoFotos);
+        rvFotos.setLayoutManager(new LinearLayoutManager(this)); // Disposición vertical
 
-        rvFotos.setLayoutManager(new LinearLayoutManager(this));
-
-        // Inicializamos Firestore
+        // Inicializa Firestore y la lista de fotos
         db = FirebaseFirestore.getInstance();
         fotoList = new ArrayList<>();
 
-        // Configuramos el adaptador sin botón de eliminación
-        fotoAdapter = new FotoAdapter(fotoList, null, false); // false para no mostrar el botón eliminar
+        // Crea el adaptador. El segundo parámetro es null y el tercero false para no mostrar botón eliminar
+        fotoAdapter = new FotoAdapter(fotoList, null, false);
         rvFotos.setAdapter(fotoAdapter);
 
-        // Cargamos las fotos desde Firebase Firestore
+        // Carga las fotos desde Firebase
         loadFotos();
     }
 
+    /**
+     * Obtiene las fotos desde Firestore donde el estado sea "admitida".
+     * Actualiza el RecyclerView con los datos o muestra un mensaje si no hay fotos.
+     */
     private void loadFotos() {
         db.collection("fotos")
-                .whereEqualTo("estado", "admitida") // Solo las fotos admitidas
+                .whereEqualTo("estado", "admitida") // Solo mostrar fotos con estado "admitida"
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    fotoList.clear();
+                    fotoList.clear(); // Limpia la lista actual
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Foto foto = doc.toObject(Foto.class);
                         if (foto != null) {
-                            foto.setId(doc.getId());
+                            foto.setId(doc.getId()); // Asigna el ID del documento
                             fotoList.add(foto);
                         }
                     }
 
-                    // Mostrar u ocultar el mensaje según el estado de la lista
+                    // Si no hay fotos, muestra mensaje de "sin fotos"
                     if (fotoList.isEmpty()) {
                         tvNoFotos.setVisibility(View.VISIBLE);
                         rvFotos.setVisibility(View.GONE);
@@ -72,10 +82,12 @@ public class GalleryActivity extends AppCompatActivity {
                         rvFotos.setVisibility(View.VISIBLE);
                     }
 
-                    // Notificamos al adaptador que los datos han cambiado
+                    // Notifica al adaptador que los datos han cambiado
                     fotoAdapter.notifyDataSetChanged();
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(GalleryActivity.this, "Error al cargar fotografías", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    // Muestra un mensaje de error si la carga falla
+                    Toast.makeText(GalleryActivity.this, "Error al cargar fotografías", Toast.LENGTH_SHORT).show();
+                });
     }
 }

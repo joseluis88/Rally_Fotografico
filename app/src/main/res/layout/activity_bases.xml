@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollViewBases"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".activities.BasesActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTituloBases"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/titulo_bases"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/tvBasesParticipantes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cargando_bases_participantes"
+            android:textSize="16sp"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:id="@+id/tvBasesPublico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cargando_bases_publico"
+            android:textSize="16sp"
+            android:textColor="?android:textColorPrimary" />
+
+    </LinearLayout>
+</ScrollView>

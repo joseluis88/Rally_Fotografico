@@ -14,24 +14,38 @@ import com.example.rallyfotografico.models.Usuario;
 
 import java.util.List;
 
+/**
+ * Adaptador personalizado para mostrar y gestionar una lista de usuarios en un RecyclerView.
+ * Se usa principalmente en la sección de administración de usuarios.
+ */
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsuarioViewHolder> {
 
-    // Interface para manejar acciones sobre cada usuario
+    /**
+     * Interfaz que define las acciones disponibles para cada usuario:
+     * eliminar o cambiar el rol (administrador/participante).
+     */
     public interface OnUserActionListener {
         void onDeleteClick(Usuario usuario);
         void onToggleAdminClick(Usuario usuario);
     }
 
-    private List<Usuario> usuarioList;
-    private OnUserActionListener listener;
-    // Definimos el email del administrador principal
-    private static final String ROOT_ADMIN_EMAIL = "moto_castrol@hotmail.com";
+    private List<Usuario> usuarioList;               // Lista de usuarios a mostrar
+    private OnUserActionListener listener;           // Listener para acciones sobre usuarios
+    private static final String ROOT_ADMIN_EMAIL = "moto_castrol@hotmail.com";  // Email del admin principal
 
+    /**
+     * Constructor del adaptador.
+     * @param usuarioList Lista de usuarios
+     * @param listener Listener para manejar acciones sobre usuarios
+     */
     public UserAdapter(List<Usuario> usuarioList, OnUserActionListener listener) {
         this.usuarioList = usuarioList;
         this.listener = listener;
     }
 
+    /**
+     * Infla el layout para cada elemento de la lista.
+     */
     @NonNull
     @Override
     public UsuarioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,6 +54,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsuarioViewHol
         return new UsuarioViewHolder(view);
     }
 
+    /**
+     * Asigna los datos de cada usuario a su respectivo ViewHolder.
+     */
     @Override
     public void onBindViewHolder(@NonNull UsuarioViewHolder holder, int position) {
         Usuario usuario = usuarioList.get(position);
@@ -47,7 +64,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsuarioViewHol
         holder.tvEmail.setText(usuario.getEmail());
         holder.tvRol.setText("Rol: " + usuario.getRol());
 
-        // Si el usuario es el root (administrador principal), no se permite eliminar ni cambiar rol
+        // El administrador principal no puede ser eliminado ni cambiar su rol
         if (usuario.getEmail().equals(ROOT_ADMIN_EMAIL)) {
             holder.btnEliminar.setVisibility(View.GONE);
             holder.btnToggleAdmin.setVisibility(View.GONE);
@@ -55,14 +72,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsuarioViewHol
             holder.btnEliminar.setVisibility(View.VISIBLE);
             holder.btnToggleAdmin.setVisibility(View.VISIBLE);
 
-            // Configurar el texto del botón de cambio de rol según el rol actual
+            // Mostrar el texto adecuado en el botón según el rol actual
             if ("administrador".equalsIgnoreCase(usuario.getRol())) {
                 holder.btnToggleAdmin.setText("Quitar Admin");
             } else {
                 holder.btnToggleAdmin.setText("Hacer Admin");
             }
 
-            // Asignar los listeners de clic
+            // Asignar eventos a los botones
             holder.btnEliminar.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteClick(usuario);
@@ -77,11 +94,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UsuarioViewHol
         }
     }
 
+    /**
+     * Devuelve la cantidad de usuarios en la lista.
+     */
     @Override
     public int getItemCount() {
         return usuarioList.size();
     }
 
+    /**
+     * ViewHolder para cada ítem de usuario.
+     */
     public static class UsuarioViewHolder extends RecyclerView.ViewHolder {
         TextView tvNombre, tvEmail, tvRol;
         Button btnEliminar, btnToggleAdmin;

@@ -18,30 +18,34 @@
             android:id="@+id/tvNombre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre"
+            android:text="@string/usuario_nombre"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="?android:textColorPrimary" />
 
         <TextView
             android:id="@+id/tvEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="correo@example.com"
-            android:textSize="14sp" />
+            android:text="@string/usuario_email"
+            android:textSize="14sp"
+            android:textColor="?android:textColorPrimary" />
 
         <TextView
             android:id="@+id/tvRol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Rol: participante"
-            android:textSize="14sp" />
+            android:text="@string/usuario_rol_participante"
+            android:textSize="14sp"
+            android:textColor="?android:textColorPrimary" />
 
         <!-- Botón para eliminar usuario -->
         <Button
             android:id="@+id/btnEliminar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Eliminar"
+            android:text="@string/eliminar"
+            android:textColor="@android:color/white"
             android:layout_marginTop="8dp" />
 
         <!-- Botón para cambiar rol -->
@@ -49,7 +53,8 @@
             android:id="@+id/btnToggleAdmin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hacer Admin"
+            android:text="@string/hacer_admin"
+            android:textColor="@android:color/white"
             android:layout_marginTop="8dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,0 +1,149 @@
+<?xml version="1.0" ?>
+<resources>
+    <string name="app_name">Photo Rally JLRF</string>
+
+    <!-- Comun -->
+    <string name="hint_correo">Email</string>
+    <string name="hint_seudonimo">Nickname</string>
+    <string name="hint_contrasena">Password</string>
+    <string name="hint_nombre">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="estado_pendiente">Status: Pending</string>
+    <string name="eliminar">Delete</string>
+
+    <!-- Admin Dashboard -->
+    <string name="titulo_admin">Admin Panel</string>
+    <string name="btn_config_rally">Configure Rally</string>
+    <string name="btn_gestion_usuarios">Manage Users</string>
+    <string name="btn_validar_fotos">Validate Photos</string>
+    <string name="btn_ver_estadisticas">View Statistics</string>
+
+    <!-- Bases -->
+    <string name="titulo_bases">Contest Rules</string>
+    <string name="cargando_bases_participantes">Loading rules for participants...</string>
+    <string name="cargando_bases_publico">Loading rules for the public...</string>
+
+    <!-- Config_rally -->
+    <string name="titulo_configuracion">Rally Settings</string>
+    <string name="seccion_participantes">FOR PARTICIPANTS</string>
+    <string name="hint_mensaje_participante">Motivational message</string>
+    <string name="hint_tamano_maximo">Maximum size in MB</string>
+    <string name="hint_resolucion">Maximum resolution (e.g. 1920x1080)</string>
+    <string name="hint_tipo_imagen">Allowed formats (jpg, png...)</string>
+    <string name="hint_fecha_limite">Submission deadline</string>
+    <string name="hint_limite_fotos">Maximum photos per participant</string>
+    <string name="seccion_publico">FOR GENERAL PUBLIC</string>
+    <string name="hint_mensaje_publico">Motivational message for the public</string>
+    <string name="hint_fecha_inicio_votacion">Voting start date</string>
+    <string name="hint_fecha_fin_votacion">Voting end date</string>
+    <string name="btn_guardar_config">Save Configuration</string>
+    <string name="btn_limpiar_campos">Clear Fields</string>
+
+    <!-- Editar_Perfil -->
+    <string name="titulo_editar_perfil">Edit Profile</string>
+    <string name="hint_nombre_completo">Full name</string>
+    <string name="hint_password_actual">Current password</string>
+    <string name="hint_password_nueva">New password</string>
+    <string name="hint_password_confirmar">Confirm new password</string>
+    <string name="btn_guardar_cambios">Save Changes</string>
+    <string name="cd_mostrar_password_actual">Show current password</string>
+    <string name="cd_mostrar_password_nueva">Show new password</string>
+    <string name="cd_mostrar_password_confirmar">Show confirm password</string>
+
+    <!-- Gallery -->
+    <string name="titulo_galeria">Photo Gallery</string>
+    <string name="msg_no_fotos">No photos available</string>
+
+    <!-- Gestion_Usuarios -->
+    <string name="titulo_usuarios">User List</string>
+
+
+    <!-- Home -->
+    <string name="titulo_home">Photo Rally</string>
+    <string name="descripcion_imagen_inicio">Startup image</string>
+    <string name="ver_bases">View Contest Rules</string>
+    <string name="registrarse">Register</string>
+    <string name="iniciar_sesion">Login</string>
+    <string name="publico">Public</string>
+
+    <!-- Login -->
+    <string name="titulo_login">Login</string>
+    <string name="btn_iniciar_sesion">Login</string>
+    <string name="desc_toggle_contrasena">Show password</string>
+
+    <!-- Perfil -->
+    <string name="titulo_perfil">My Profile</string>
+    <string name="hint_rol">Role</string>
+    <string name="btn_editar_perfil">Edit Profile</string>
+    <string name="btn_admin_dashboard">Admin Panel</string>
+    <string name="btn_subir_imagen_inicio">Upload start image</string>
+    <string name="btn_subir_fotos">Upload Photos</string>
+    <string name="titulo_mis_fotos">My Photographs</string>
+    <string name="btn_cerrar_sesion">Log Out</string>
+    <string name="switchNotificaciones">Notifications</string>
+
+    <!-- Preview_Image -->
+    <string name="desc_preview_imagen">Image preview</string>
+
+
+    <!-- Public_Home -->
+    <string name="titulo_publico_general">General Public</string>
+    <string name="btn_solicitar_alta">Request Access</string>
+    <string name="btn_galeria">Gallery</string>
+    <string name="btn_votar_fotos">Vote Photos</string>
+    <string name="btn_ver_ranking">View Ranking and Charts</string>
+
+
+    <!-- Ranking -->
+    <string name="titulo_ranking_fotografias">Photo Ranking</string>
+
+    <!-- Registro -->
+    <string name="registro_titulo">User Registration</string>
+    <string name="hint_confirmar_contrasena">Confirm password</string>
+    <string name="btn_registrarse">Register</string>
+    <string name="cd_toggle_password">Show password</string>
+    <string name="cd_toggle_confirmar_password">Show confirm password</string>
+
+    <!-- Stats -->
+    <string name="stats_titulo">Rally Statistics</string>
+    <string name="stats_total_fotos">Total photos uploaded: 0</string>
+    <string name="stats_total_votos">Total votes cast: 0</string>
+    <string name="stats_btn_ver_graficos">View Charts</string>
+
+    <!-- Upload_Photo -->
+    <string name="subida_titulo">Photo Upload to the Rally</string>
+    <string name="subida_sin_imagen">No image selected</string>
+    <string name="subida_btn_seleccionar">Select Photo</string>
+    <string name="subida_btn_subir">Upload Photo</string>
+    <string name="subida_btn_quitar">Remove Selected Photo</string>
+
+
+    <!-- Validar_Foto -->
+    <string name="validar_titulo">Validate Photos</string>
+    <string name="validar_sin_fotos">No pending photos to validate</string>
+
+    <!-- Validar_Fotos_Adapter -->
+    <string name="validar_placeholder">Adapter view not defined</string>
+
+    <!-- Voting -->
+    <string name="votos_restantes_default">Remaining votes: 5</string>
+
+    <!-- Item_Foto (Está en comun)-->
+
+    <!-- Item_Usuario -->
+    <string name="usuario_nombre">Name</string>
+    <string name="usuario_email">email@example.com</string>
+    <string name="usuario_rol_participante">Role: participant</string>
+    <string name="hacer_admin">Make Admin</string>
+
+    <!-- Item_Validar_Foto -->
+    <string name="admitir">Approve</string>
+    <string name="rechazar">Reject</string>
+
+    <!-- Item_Voting_Photo -->
+    <string name="votos_contador">Votes: 0</string>
+    <string name="estado_admitida">Status: admitted</string>
+    <string name="votar">Vote</string>
+
+
+</resources>

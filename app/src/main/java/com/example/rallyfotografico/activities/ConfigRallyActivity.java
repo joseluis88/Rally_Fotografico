@@ -4,150 +4,242 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.rallyfotografico.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Actividad que permite al administrador configurar los parámetros del rally fotográfico.
+ * Incluye validación de fechas, restricciones y guardado en Firestore.
+ */
 public class ConfigRallyActivity extends AppCompatActivity {
 
-    private EditText etTamañoMaximo, etResolucion, etTipoImagen, etFechaLimite, etLimiteFotos, etFechaInicioVotacion, etFechaFinVotacion;
-    private Button btnGuardarConfig;
+    // Campos de entrada de datos
+    private EditText etMensajeParticipante, etTamanoMaximo, etResolucion, etTipoImagen,
+            etFechaLimite, etLimiteFotos, etMensajePublico, etFechaInicioVotacion, etFechaFinVotacion, etTituloInicio;
+    private Button btnGuardarConfig, btnLimpiarCampos;
+
+    // Formateador de fecha para entrada/salida
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+    // Firebase
     private FirebaseFirestore db;
     private DocumentReference configRef;
-    private Calendar calendar;
 
-    // Formato de fecha para almacenar en Firestore, por ejemplo "dd/MM/yyyy"
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
+    /**
+     * Se ejecuta al crear la actividad.
+     * Inicializa vistas, conecta con Firestore y carga la configuración existente.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config_rally);
 
-        // Vincular los elementos del layout
-        etTamañoMaximo = findViewById(R.id.etTamañoMaximo);
+        // Referencias a los campos del layout
+        etTituloInicio = findViewById(R.id.etTituloInicio);
+        etMensajeParticipante = findViewById(R.id.etMensajeParticipante);
+        etTamanoMaximo = findViewById(R.id.etTamanoMaximo);
         etResolucion = findViewById(R.id.etResolucion);
         etTipoImagen = findViewById(R.id.etTipoImagen);
         etFechaLimite = findViewById(R.id.etFechaLimite);
         etLimiteFotos = findViewById(R.id.etLimiteFotos);
+        etMensajePublico = findViewById(R.id.etMensajePublico);
         etFechaInicioVotacion = findViewById(R.id.etFechaInicioVotacion);
         etFechaFinVotacion = findViewById(R.id.etFechaFinVotacion);
         btnGuardarConfig = findViewById(R.id.btnGuardarConfig);
+        btnLimpiarCampos = findViewById(R.id.btnLimpiarCampos);
 
+        // Inicializa Firestore
         db = FirebaseFirestore.getInstance();
-        // Se asume que la configuración está en la colección "configuracion" y el documento "rally"
         configRef = db.collection("configuracion").document("rally");
 
-        calendar = Calendar.getInstance();
+        // Selección de fechas
+        etFechaLimite.setOnClickListener(v -> showDatePicker(etFechaLimite));
+        etFechaInicioVotacion.setOnClickListener(v -> showDatePicker(etFechaInicioVotacion));
+        etFechaFinVotacion.setOnClickListener(v -> showDatePicker(etFechaFinVotacion));
 
-        // Configurar DatePicker para los campos de fecha
-        etFechaLimite.setOnClickListener(v -> showDatePickerDialog(etFechaLimite));
-        etFechaInicioVotacion.setOnClickListener(v -> showDatePickerDialog(etFechaInicioVotacion));
-        etFechaFinVotacion.setOnClickListener(v -> showDatePickerDialog(etFechaFinVotacion));
+        // Guardar configuración
+        btnGuardarConfig.setOnClickListener(v -> guardarConfiguracion());
 
-        // Cargar la configuración actual si existe
-        loadConfig();
+        // Limpiar campos
+        btnLimpiarCampos.setOnClickListener(v -> limpiarCampos());
+        btnLimpiarCampos.setVisibility(View.GONE);
 
-        btnGuardarConfig.setOnClickListener(v -> {
-            String tamañoMaximoStr = etTamañoMaximo.getText().toString().trim();
-            String resolucion = etResolucion.getText().toString().trim();
-            String tipoImagen = etTipoImagen.getText().toString().trim();
-            String fechaLimite = etFechaLimite.getText().toString().trim();
-            String limiteFotosStr = etLimiteFotos.getText().toString().trim();
-            String fechaInicioVotacion = etFechaInicioVotacion.getText().toString().trim();
-            String fechaFinVotacion = etFechaFinVotacion.getText().toString().trim();
+        // Cargar configuración si ya existe
+        cargarConfiguracionExistente();
+    }
 
-            if (TextUtils.isEmpty(tamañoMaximoStr) || TextUtils.isEmpty(resolucion) || TextUtils.isEmpty(tipoImagen)
-                    || TextUtils.isEmpty(fechaLimite) || TextUtils.isEmpty(limiteFotosStr)
-                    || TextUtils.isEmpty(fechaInicioVotacion) || TextUtils.isEmpty(fechaFinVotacion)) {
-                Toast.makeText(ConfigRallyActivity.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
+    /**
+     * Muestra un selector de fecha y coloca la selección en el campo correspondiente.
+     * @param campo Campo de texto donde se insertará la fecha elegida.
+     */
+    private void showDatePicker(EditText campo) {
+        Calendar cal = Calendar.getInstance();
+        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            cal.set(year, month, dayOfMonth);
+            campo.setText(dateFormat.format(cal.getTime()));
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    /**
+     * Guarda la configuración introducida en Firestore tras validar los campos.
+     * Valida fechas y formatos numéricos.
+     */
+    private void guardarConfiguracion() {
+        String tituloInicio = etTituloInicio.getText().toString().trim();
+        String mensajePart = etMensajeParticipante.getText().toString().trim();
+        String tamano = etTamanoMaximo.getText().toString().trim();
+        String resolucion = etResolucion.getText().toString().trim();
+        String tipo = etTipoImagen.getText().toString().trim();
+        String fechaLimiteStr = etFechaLimite.getText().toString().trim();
+        String limiteFotosStr = etLimiteFotos.getText().toString().trim();
+        String mensajePub = etMensajePublico.getText().toString().trim();
+        String fechaInicioStr = etFechaInicioVotacion.getText().toString().trim();
+        String fechaFinStr = etFechaFinVotacion.getText().toString().trim();
+
+        // Validación de campos vacíos
+        if (TextUtils.isEmpty(tituloInicio) || TextUtils.isEmpty(mensajePart) || TextUtils.isEmpty(tamano) || TextUtils.isEmpty(resolucion) ||
+                TextUtils.isEmpty(tipo) || TextUtils.isEmpty(fechaLimiteStr) || TextUtils.isEmpty(limiteFotosStr) ||
+                TextUtils.isEmpty(mensajePub) || TextUtils.isEmpty(fechaInicioStr) || TextUtils.isEmpty(fechaFinStr)) {
+            Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Validación de fechas (en orden correcto)
+            long fechaLimite = dateFormat.parse(fechaLimiteStr).getTime();
+            long fechaInicio = dateFormat.parse(fechaInicioStr).getTime();
+            long fechaFin = dateFormat.parse(fechaFinStr).getTime();
+
+            if (fechaInicio < fechaLimite) {
+                Toast.makeText(this, "La fecha de inicio de votaciones no puede ser antes de la fecha límite de fotos", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            double tamañoMaximoMB = Double.parseDouble(tamañoMaximoStr);
+            if (fechaFin < fechaInicio) {
+                Toast.makeText(this, "La fecha fin de votación debe ser posterior a la de inicio", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            // Conversión numérica
+            double tamanoMB = Double.parseDouble(tamano);
             int limiteFotos = Integer.parseInt(limiteFotosStr);
 
-            Map<String, Object> configMap = new HashMap<>();
-            configMap.put("tamañoMaximoMB", tamañoMaximoMB);
-            configMap.put("resolucion", resolucion);
-            configMap.put("tipoImagen", tipoImagen); // Ej: "jpg,png,jpeg"
-            configMap.put("fechaLimite", fechaLimite);
-            configMap.put("limiteFotos", limiteFotos);
-            configMap.put("fechaInicioVotacion", fechaInicioVotacion);
-            configMap.put("fechaFinVotacion", fechaFinVotacion);
+            // Creación de objeto con datos a guardar
+            Map<String, Object> datos = new HashMap<>();
+            datos.put("tituloInicio", tituloInicio);
+            datos.put("mensajeParticipantes", mensajePart);
+            datos.put("tamañoMaximoMB", tamanoMB);
+            datos.put("resolucion", resolucion);
+            datos.put("tipoImagen", tipo);
+            datos.put("fechaLimite", fechaLimiteStr);
+            datos.put("limiteFotos", limiteFotos);
+            datos.put("mensajePublico", mensajePub);
+            datos.put("fechaInicioVotacion", fechaInicioStr);
+            datos.put("fechaFinVotacion", fechaFinStr);
 
-            configRef.set(configMap).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(ConfigRallyActivity.this, "Configuración guardada", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(ConfigRallyActivity.this, AdminDashboardActivity.class));
-                } else {
-                    Toast.makeText(ConfigRallyActivity.this, "Error al guardar configuración", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+            // Guardar en Firestore
+            configRef.set(datos).addOnSuccessListener(unused -> {
+                Toast.makeText(this, "Configuración guardada correctamente", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ConfigRallyActivity.this, PerfilActivity.class));
+            }).addOnFailureListener(e ->
+                    Toast.makeText(this, "Error al guardar la configuración", Toast.LENGTH_SHORT).show()
+            );
+
+        } catch (ParseException | NumberFormatException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al validar fechas o números", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void showDatePickerDialog(EditText targetEditText) {
-        Calendar cal = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                ConfigRallyActivity.this,
-                (DatePicker view, int year, int month, int dayOfMonth) -> {
-                    cal.set(Calendar.YEAR, year);
-                    cal.set(Calendar.MONTH, month);
-                    cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    targetEditText.setText(dateFormat.format(cal.getTime()));
-                },
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
-    }
+    /**
+     * Carga la configuración existente desde Firestore y la muestra en los campos correspondientes.
+     */
+    private void cargarConfiguracionExistente() {
+        configRef.get().addOnSuccessListener(snapshot -> {
+            if (snapshot.exists()) {
+                setTextoSiExiste(snapshot.getString("tituloInicio"), etTituloInicio);
+                setTextoSiExiste(snapshot.getString("mensajeParticipantes"), etMensajeParticipante);
 
-    // Cargar la configuración actual desde Firestore (si existe)
-    private void loadConfig() {
-        configRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                if(documentSnapshot.contains("tamañoMaximoMB")){
-                    double tamañoMaximo = documentSnapshot.getDouble("tamañoMaximoMB");
-                    etTamañoMaximo.setText(String.valueOf(tamañoMaximo));
-                }
-                if(documentSnapshot.contains("resolucion")){
-                    etResolucion.setText(documentSnapshot.getString("resolucion"));
-                }
-                if(documentSnapshot.contains("tipoImagen")){
-                    etTipoImagen.setText(documentSnapshot.getString("tipoImagen"));
-                }
-                if(documentSnapshot.contains("fechaLimite")){
-                    etFechaLimite.setText(documentSnapshot.getString("fechaLimite"));
-                }
-                if(documentSnapshot.contains("limiteFotos")){
-                    etLimiteFotos.setText(String.valueOf(documentSnapshot.getLong("limiteFotos")));
-                }
-                if(documentSnapshot.contains("fechaInicioVotacion")){
-                    etFechaInicioVotacion.setText(documentSnapshot.getString("fechaInicioVotacion"));
-                }
-                if(documentSnapshot.contains("fechaFinVotacion")){
-                    etFechaFinVotacion.setText(documentSnapshot.getString("fechaFinVotacion"));
-                }
+                Double tamanoMB = snapshot.getDouble("tamañoMaximoMB");
+                if (tamanoMB != null) etTamanoMaximo.setText(String.valueOf(tamanoMB));
+
+                setTextoSiExiste(snapshot.getString("resolucion"), etResolucion);
+                setTextoSiExiste(snapshot.getString("tipoImagen"), etTipoImagen);
+                setTextoSiExiste(snapshot.getString("fechaLimite"), etFechaLimite);
+
+                Long limiteFotos = snapshot.getLong("limiteFotos");
+                if (limiteFotos != null) etLimiteFotos.setText(String.valueOf(limiteFotos));
+
+                setTextoSiExiste(snapshot.getString("mensajePublico"), etMensajePublico);
+                setTextoSiExiste(snapshot.getString("fechaInicioVotacion"), etFechaInicioVotacion);
+                setTextoSiExiste(snapshot.getString("fechaFinVotacion"), etFechaFinVotacion);
+
+                verificarCamposParaMostrarBotonLimpiar();
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(ConfigRallyActivity.this, "Error al cargar la configuración", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    /**
+     * Establece texto en un campo solo si el valor no es nulo ni vacío.
+     */
+    private void setTextoSiExiste(String valor, EditText campo) {
+        if (valor != null && !valor.isEmpty()) {
+            campo.setText(valor);
+        }
+    }
+
+    /**
+     * Muestra el botón de limpiar solo si hay algún campo con contenido.
+     */
+    private void verificarCamposParaMostrarBotonLimpiar() {
+        if (!etTituloInicio.getText().toString().isEmpty() ||
+                !etMensajeParticipante.getText().toString().isEmpty() ||
+                !etTamanoMaximo.getText().toString().isEmpty() ||
+                !etResolucion.getText().toString().isEmpty() ||
+                !etTipoImagen.getText().toString().isEmpty() ||
+                !etFechaLimite.getText().toString().isEmpty() ||
+                !etLimiteFotos.getText().toString().isEmpty() ||
+                !etMensajePublico.getText().toString().isEmpty() ||
+                !etFechaInicioVotacion.getText().toString().isEmpty() ||
+                !etFechaFinVotacion.getText().toString().isEmpty()) {
+            btnLimpiarCampos.setVisibility(View.VISIBLE);
+        } else {
+            btnLimpiarCampos.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Limpia todos los campos del formulario y oculta el botón de limpiar.
+     */
+    private void limpiarCampos() {
+        etTituloInicio.setText("");
+        etMensajeParticipante.setText("");
+        etTamanoMaximo.setText("");
+        etResolucion.setText("");
+        etTipoImagen.setText("");
+        etFechaLimite.setText("");
+        etLimiteFotos.setText("");
+        etMensajePublico.setText("");
+        etFechaInicioVotacion.setText("");
+        etFechaFinVotacion.setText("");
+        btnLimpiarCampos.setVisibility(View.GONE);
     }
 }

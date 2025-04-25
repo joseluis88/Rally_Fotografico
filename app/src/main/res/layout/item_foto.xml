@@ -27,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Estado: Pendiente"
-            android:textColor="@android:color/darker_gray"
+            android:text="@string/estado_pendiente"
+            android:textColor="?android:textColorSecondary"
             android:textSize="14sp" />
 
         <!-- Botón para eliminar la foto -->
@@ -36,7 +36,8 @@
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Eliminar"
+            android:text="@string/eliminar"
+            android:textColor="@android:color/white"
             android:layout_marginTop="8dp"
             android:layout_gravity="center_horizontal"/>
     </LinearLayout>

@@ -5,39 +5,31 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     tools:context=".activities.VotingActivity">
 
     <TextView
         android:id="@+id/tvVotosRestantes"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Votos restantes: 5"
-        android:textSize="18sp"
+        android:text="@string/votos_restantes_default"
+        android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ImageView
-        android:id="@+id/ivFotoVotacion"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvVoting"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:layout_margin="16dp"
-        android:scaleType="centerCrop"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVotosRestantes" />
-
-    <Button
-        android:id="@+id/btnVotar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Votar"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivFotoVotacion" />
+        app:layout_constraintTop_toBottomOf="@id/tvVotosRestantes"
+        tools:listitem="@layout/item_voting_photo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

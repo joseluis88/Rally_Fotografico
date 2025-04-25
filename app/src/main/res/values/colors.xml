@@ -2,7 +2,29 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Colores principales -->
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryVariant">#3700B3</color>
     <color name="colorSecondary">#03DAC5</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="switch_track">#BBDEFB</color> <!-- azul claro -->
+
+
+    <!-- Validaciones -->
+    <color name="red">#D32F2F</color>
+    <color name="green">#00C853</color>
+
+    <!-- Borde por defecto del EditText -->
+    <color name="editTextStroke">#CCCCCC</color>
+
+    <!-- Fondo del formulario -->
+    <color name="backgroundColor">#FFFFFF</color>
+
+    <!-- Fondo configuración rally -->
+    <color name="colorPrimaryDark">#004BA0</color>
+    <color name="colorAccent">#FFC107</color>
 </resources>

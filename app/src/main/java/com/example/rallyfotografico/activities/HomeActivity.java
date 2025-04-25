@@ -1,106 +1,138 @@
 package com.example.rallyfotografico.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.bumptech.glide.Glide;
 import com.example.rallyfotografico.R;
+import com.example.rallyfotografico.services.FirebaseService;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentSnapshot;
 
+/**
+ * Actividad principal del inicio de la app.
+ * Desde aquí se accede al registro, login, modo público y a las bases del concurso.
+ * También carga una imagen personalizada y un título personalizado desde Firestore si están configurados.
+ */
 public class HomeActivity extends AppCompatActivity {
 
-    private Button btnRegistro, btnLogin, btnGaleria;
-    private TextView tvInfoRally;
-    private FirebaseFirestore db;
+    // Elementos de la interfaz
+    private Button btnRegistro, btnLogin, btnEntrarPublico, btnBases;
+    private ImageView ivImagenInicio;
+    private TextView tvTitulo; // Título dinámico
+
+    // Servicios y referencias de Firestore
+    private final FirebaseService firebaseService = FirebaseService.getInstance();
     private DocumentReference configRef;
+    private String urlImagenInicio = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Establece el modo noche según el sistema
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Solicita permiso para notificaciones (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+        }
+
+        // Inicializa elementos visuales
         btnRegistro = findViewById(R.id.btnRegistro);
         btnLogin = findViewById(R.id.btnLogin);
-        btnGaleria = findViewById(R.id.btnGaleria);
-        tvInfoRally = findViewById(R.id.tvInfoRally);
+        btnEntrarPublico = findViewById(R.id.btnEntrarPublico);
+        btnBases = findViewById(R.id.btnBases);
+        ivImagenInicio = findViewById(R.id.ivImagenInicio);
+        tvTitulo = findViewById(R.id.tvTitulo); // Nuevo título dinámico
 
-        db = FirebaseFirestore.getInstance();
-        // Se asume que la configuración está en la colección "configuracion" y el documento "rally"
-        configRef = db.collection("configuracion").document("rally");
+        // Referencia al documento de configuración
+        configRef = firebaseService.getFirestore().collection("configuracion").document("rally");
 
-        // Cargar la configuración del rally y mostrarla en la pantalla
-        loadConfig();
+        // Botón para ir a RegistroActivity
+        btnRegistro.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, RegistroActivity.class)));
 
-        btnRegistro.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, RegistroActivity.class);
-            startActivity(intent);
-        });
+        // Botón para ir a LoginActivity
+        btnLogin.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, LoginActivity.class)));
 
-        btnLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
+        // Botón para entrar en modo público
+        btnEntrarPublico.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, PublicHomeActivity.class)));
 
-        btnGaleria.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, GalleryActivity.class);
-            startActivity(intent);
+        // Botón para ver las bases del concurso
+        btnBases.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, BasesActivity.class)));
+
+        // Clic sobre la imagen de inicio: la muestra en pantalla completa si existe
+        ivImagenInicio.setOnClickListener(v -> {
+            if (urlImagenInicio != null && !urlImagenInicio.isEmpty()) {
+                Intent intent = new Intent(HomeActivity.this, PreviewImageActivity.class);
+                intent.putExtra(PreviewImageActivity.EXTRA_IMAGE_URI, urlImagenInicio);
+                startActivity(intent);
+            }
         });
     }
 
-    private void loadConfig() {
+    /**
+     * Al volver a esta actividad, se vuelve a cargar la imagen y el título de inicio.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cargarImagenDeInicio();
+        cargarTituloDeInicio();
+    }
+
+    /**
+     * Carga la URL de la imagen definida por el administrador desde Firestore.
+     */
+    private void cargarImagenDeInicio() {
         configRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                // Obtener todos los parámetros configurados
-                Double tamañoMaximoMB = documentSnapshot.getDouble("tamañoMaximoMB");
-                String resolucion = documentSnapshot.getString("resolucion");
-                String tipoImagen = documentSnapshot.getString("tipoImagen");
-                String fechaLimite = documentSnapshot.getString("fechaLimite");
-                Long limiteFotos = documentSnapshot.getLong("limiteFotos");
-                String fechaInicioVotacion = documentSnapshot.getString("fechaInicioVotacion");
-                String fechaFinVotacion = documentSnapshot.getString("fechaFinVotacion");
+            if (documentSnapshot.exists() && documentSnapshot.contains("imagenInicio")) {
+                urlImagenInicio = documentSnapshot.getString("imagenInicio");
+                Log.d("HomeActivity", "URL imagen cargada: " + urlImagenInicio);
 
-                // Construir el mensaje de información del rally
-                StringBuilder infoBuilder = new StringBuilder();
-                infoBuilder.append("Bases del concurso:\n");
-                infoBuilder.append("- Los participantes deben subir fotos según las directrices establecidas.\n\n");
-                infoBuilder.append("Configuración del Concurso:\n");
-                if (tamañoMaximoMB != null) {
-                    infoBuilder.append("Tamaño máximo: ").append(tamañoMaximoMB).append(" MB\n");
+                if (urlImagenInicio != null && !urlImagenInicio.isEmpty()) {
+                    Glide.with(this)
+                            .load(urlImagenInicio)
+                            .placeholder(R.drawable.ic_launcher_foreground)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .into(ivImagenInicio);
                 }
-                if (resolucion != null) {
-                    infoBuilder.append("Resolución: ").append(resolucion).append("\n");
-                }
-                if (tipoImagen != null) {
-                    infoBuilder.append("Tipo de imagen: ").append(tipoImagen).append("\n");
-                }
-                if (fechaLimite != null) {
-                    infoBuilder.append("Fecha límite de recepción: ").append(fechaLimite).append("\n");
-                }
-                if (limiteFotos != null) {
-                    infoBuilder.append("Número máximo de fotos: ").append(limiteFotos).append("\n");
-                }
-                if (fechaInicioVotacion != null && fechaFinVotacion != null) {
-                    infoBuilder.append("Votaciones: Desde ").append(fechaInicioVotacion)
-                            .append(" hasta ").append(fechaFinVotacion).append("\n");
-                }
-                infoBuilder.append("\n¡Participa y demuestra tu creatividad!");
-
-                tvInfoRally.setText(infoBuilder.toString());
             } else {
-                tvInfoRally.setText("La configuración del rally no ha sido establecida.");
+                Log.d("HomeActivity", "No hay imagenInicio en Firestore.");
             }
         }).addOnFailureListener(e -> {
-            Toast.makeText(HomeActivity.this, "Error al cargar la configuración del rally", Toast.LENGTH_SHORT).show();
-            Log.e("HomeActivity", "loadConfig error: ", e);
+            Toast.makeText(this, "Error al cargar imagen de inicio", Toast.LENGTH_SHORT).show();
+            Log.e("HomeActivity", "Error al cargar desde Firestore: ", e);
+        });
+    }
+
+    /**
+     * Carga el título de inicio definido por el administrador desde Firestore.
+     */
+    private void cargarTituloDeInicio() {
+        configRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists() && documentSnapshot.contains("tituloInicio")) {
+                String tituloInicio = documentSnapshot.getString("tituloInicio");
+                if (tituloInicio != null && !tituloInicio.isEmpty()) {
+                    tvTitulo.setText(tituloInicio);
+                }
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Error al cargar el título", Toast.LENGTH_SHORT).show();
+            Log.e("HomeActivity", "Error al obtener tituloInicio", e);
         });
     }
 }

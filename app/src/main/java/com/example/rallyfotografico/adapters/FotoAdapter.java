@@ -19,23 +19,52 @@ import com.example.rallyfotografico.models.Foto;
 
 import java.util.List;
 
+/**
+ * Adaptador personalizado para mostrar objetos Foto en un RecyclerView.
+ * Puede configurarse para mostrar botón de eliminación o posición en ranking.
+ */
 public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ViewHolder> {
 
+    /**
+     * Interfaz para capturar el evento de eliminación de una foto.
+     */
     public interface OnDeleteClickListener {
         void onDeleteClick(Foto foto);
     }
 
-    private List<Foto> fotoList;
-    private OnDeleteClickListener listener;
-    private boolean mostrarBotonEliminar;
+    private List<Foto> fotoList;                     // Lista de fotos a mostrar
+    private OnDeleteClickListener listener;          // Listener para botón eliminar
+    private boolean mostrarBotonEliminar;            // Si se debe mostrar el botón eliminar
+    private boolean mostrarPosicion;                 // Si se debe mostrar el ranking
 
-    // Constructor: pasar la lista de fotos, un listener para eliminar y un flag para mostrar o no el botón
+    /**
+     * Constructor tradicional (perfil de usuario o validación de fotos).
+     * @param fotoList Lista de fotos a mostrar
+     * @param listener Listener para eliminar fotos
+     * @param mostrarBotonEliminar Si se debe mostrar el botón de eliminar
+     */
     public FotoAdapter(List<Foto> fotoList, OnDeleteClickListener listener, boolean mostrarBotonEliminar) {
         this.fotoList = fotoList;
         this.listener = listener;
         this.mostrarBotonEliminar = mostrarBotonEliminar;
+        this.mostrarPosicion = false;
     }
 
+    /**
+     * Constructor especial para el ranking (sin botón eliminar, con posición).
+     * @param fotoList Lista de fotos
+     * @param mostrarPosicion True para mostrar la posición en el ranking
+     */
+    public FotoAdapter(List<Foto> fotoList, boolean mostrarPosicion) {
+        this.fotoList = fotoList;
+        this.listener = null;
+        this.mostrarBotonEliminar = false;
+        this.mostrarPosicion = mostrarPosicion;
+    }
+
+    /**
+     * Infla el layout del ítem de foto.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,6 +73,9 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+    /**
+     * Asocia los datos de una foto a su vista.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Foto foto = fotoList.get(position);
@@ -54,20 +86,22 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ViewHolder> {
                 .load(foto.getUrl())
                 .into(holder.ivFotoItem);
 
-        // Mostrar el estado de la foto (ej. "pendiente", "admitida" o "rechazada")
-        holder.tvEstadoFoto.setText("Estado: " + foto.getEstado());
+        // Mostrar estado o votos según modo
+        if (mostrarPosicion) {
+            holder.tvEstadoFoto.setText((position + 1) + "º - " + foto.getVotos() + " votos");
+        } else {
+            holder.tvEstadoFoto.setText("Estado: " + foto.getEstado());
+        }
 
-        // Controlar la visibilidad del botón de eliminar
+        // Configurar botón eliminar
         holder.btnDelete.setVisibility(mostrarBotonEliminar ? View.VISIBLE : View.GONE);
-
-        // Acción del botón eliminar
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteClick(foto);
             }
         });
 
-        // Al pulsar sobre la imagen se abre la vista previa en pantalla completa
+        // Abrir imagen en pantalla completa al hacer clic
         holder.ivFotoItem.setOnClickListener(v -> {
             Intent intent = new Intent(context, PreviewImageActivity.class);
             intent.putExtra(PreviewImageActivity.EXTRA_IMAGE_URI, foto.getUrl());
@@ -75,11 +109,17 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ViewHolder> {
         });
     }
 
+    /**
+     * Devuelve el número de ítems en la lista.
+     */
     @Override
     public int getItemCount() {
         return fotoList.size();
     }
 
+    /**
+     * ViewHolder que representa una fila de foto.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivFotoItem;
         TextView tvEstadoFoto;

@@ -18,8 +18,14 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Actividad para la gestión de usuarios desde el panel de administración.
+ * Permite visualizar la lista de usuarios, cambiar su rol (participante ↔ administrador)
+ * y eliminar usuarios registrados.
+ */
 public class GestionUsuariosActivity extends AppCompatActivity {
 
+    // Elementos de UI y Firestore
     private RecyclerView rvUsuarios;
     private FirebaseFirestore db;
     private List<Usuario> usuarioList;
@@ -30,76 +36,91 @@ public class GestionUsuariosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion_usuarios);
 
+        // Inicializa componentes de UI
         rvUsuarios = findViewById(R.id.rvUsuarios);
-        rvUsuarios.setLayoutManager(new LinearLayoutManager(this));
+        rvUsuarios.setLayoutManager(new LinearLayoutManager(this)); // Disposición vertical
+
+        // Inicializa Firestore
         db = FirebaseFirestore.getInstance();
 
+        // Lista vacía de usuarios
         usuarioList = new ArrayList<>();
+
+        // Inicializa el adaptador con funciones de acción para cada usuario
         userAdapter = new UserAdapter(usuarioList, new UserAdapter.OnUserActionListener() {
             @Override
             public void onDeleteClick(Usuario usuario) {
-                deleteUsuario(usuario);
+                deleteUsuario(usuario); // Acción de eliminar usuario
             }
 
             @Override
             public void onToggleAdminClick(Usuario usuario) {
-                toggleAdmin(usuario);
+                toggleAdmin(usuario); // Acción de cambiar rol
             }
         });
+
+        // Asocia el adaptador al RecyclerView
         rvUsuarios.setAdapter(userAdapter);
 
+        // Carga los usuarios desde Firestore
         loadUsuarios();
     }
 
-    // Consulta la colección "usuarios" y actualiza el RecyclerView
+    /**
+     * Consulta la colección "usuarios" de Firestore y actualiza la lista y el RecyclerView.
+     */
     private void loadUsuarios() {
         db.collection("usuarios")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    usuarioList.clear();
+                    usuarioList.clear(); // Limpia la lista anterior
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Usuario usuario = doc.toObject(Usuario.class);
-                        usuario.setId(doc.getId());
-                        usuarioList.add(usuario);
+                        if (usuario != null) {
+                            usuario.setId(doc.getId()); // Guarda el ID del documento
+                            usuarioList.add(usuario);
+                        }
                     }
-                    userAdapter.notifyDataSetChanged();
+                    userAdapter.notifyDataSetChanged(); // Notifica que hubo cambios
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(GestionUsuariosActivity.this, "Error al cargar usuarios", Toast.LENGTH_SHORT).show());
     }
 
-    // Elimina un usuario de la base de datos
+    /**
+     * Elimina un usuario específico de Firestore.
+     *
+     * @param usuario Objeto Usuario a eliminar.
+     */
     private void deleteUsuario(Usuario usuario) {
         db.collection("usuarios").document(usuario.getId())
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(GestionUsuariosActivity.this, "Usuario eliminado", Toast.LENGTH_SHORT).show();
-                    loadUsuarios();
+                    Toast.makeText(this, "Usuario eliminado", Toast.LENGTH_SHORT).show();
+                    loadUsuarios(); // Recargar la lista tras eliminar
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(GestionUsuariosActivity.this, "Error al eliminar usuario", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Error al eliminar usuario", Toast.LENGTH_SHORT).show());
     }
 
-    // Cambia el rol del usuario: si es "administrador" lo pone como "participante" y viceversa.
+    /**
+     * Cambia el rol de un usuario entre "participante" y "administrador".
+     *
+     * @param usuario Usuario cuyo rol se desea alternar.
+     */
     private void toggleAdmin(Usuario usuario) {
-        // Determinar el nuevo rol: si es administrador, lo quitamos, sino lo promovemos
-        String nuevoRol;
-        if ("administrador".equalsIgnoreCase(usuario.getRol())) {
-            nuevoRol = "participante";
-        } else {
-            nuevoRol = "administrador";
-        }
-        final String finalNuevoRol = nuevoRol; // variable final para usar en la lambda
+        String nuevoRol = "administrador".equalsIgnoreCase(usuario.getRol()) ? "participante" : "administrador";
+
         Map<String, Object> updateMap = new HashMap<>();
-        updateMap.put("rol", finalNuevoRol);
+        updateMap.put("rol", nuevoRol);
+
         db.collection("usuarios").document(usuario.getId())
                 .update(updateMap)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(GestionUsuariosActivity.this, "Rol actualizado a " + finalNuevoRol, Toast.LENGTH_SHORT).show();
-                    loadUsuarios();
+                    Toast.makeText(this, "Rol actualizado a " + nuevoRol, Toast.LENGTH_SHORT).show();
+                    loadUsuarios(); // Recarga la lista actualizada
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(GestionUsuariosActivity.this, "Error al actualizar rol", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Error al actualizar rol", Toast.LENGTH_SHORT).show());
     }
-
 }

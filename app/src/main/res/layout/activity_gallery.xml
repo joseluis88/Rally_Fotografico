@@ -7,6 +7,19 @@
     android:layout_height="match_parent"
     tools:context=".activities.GalleryActivity">
 
+    <!-- Título al principio del activity -->
+    <TextView
+        android:id="@+id/tvTituloGaleria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/titulo_galeria"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- RecyclerView para las fotos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFotos"
@@ -14,17 +27,17 @@
         android:layout_height="0dp"
         android:padding="8dp"
         tools:listitem="@layout/item_foto"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloGaleria"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Mensaje para cuando no haya fotos -->
     <TextView
         android:id="@+id/tvNoFotos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No hay fotos disponibles"
+        android:text="@string/msg_no_fotos"
         android:textSize="18sp"
         android:visibility="gone"
         android:layout_margin="16dp"
