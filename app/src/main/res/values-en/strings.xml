@@ -25,6 +25,7 @@
 
     <!-- Config_rally -->
     <string name="titulo_configuracion">Rally Settings</string>
+    <string name="titulo_inicio">Start title</string>
     <string name="seccion_participantes">FOR PARTICIPANTS</string>
     <string name="hint_mensaje_participante">Motivational message</string>
     <string name="hint_tamano_maximo">Maximum size in MB</string>
@@ -126,7 +127,7 @@
     <string name="validar_placeholder">Adapter view not defined</string>
 
     <!-- Voting -->
-    <string name="votos_restantes_default">Remaining votes: 5</string>
+    <string name="votos_restantes">Remaining votes: %1$d</string>
 
     <!-- Item_Foto (Está en comun)-->
 

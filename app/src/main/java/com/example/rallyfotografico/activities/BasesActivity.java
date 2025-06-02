@@ -15,7 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 /**
  * Actividad que muestra las bases del concurso fotográfico tanto para participantes
  * como para el público votante.
- *
  * Las bases se cargan dinámicamente desde Firestore (documento "rally" de la colección "configuracion").
  */
 public class BasesActivity extends AppCompatActivity {
@@ -81,6 +80,8 @@ public class BasesActivity extends AppCompatActivity {
                 StringBuilder publico = new StringBuilder();
                 publico.append("👥 BASES PARA EL PÚBLICO\n\n");
                 publico.append("- ").append(documentSnapshot.getString("mensajePublico")).append("\n\n");
+                publico.append("🔢 Votos permitidos: ")
+                        .append(documentSnapshot.getLong("votosPublico")).append("\n\n");
                 publico.append("🗳️ Inicio de votaciones: ")
                         .append(documentSnapshot.getString("fechaInicioVotacion")).append("\n");
                 publico.append("🏁 Fin de votaciones: ")

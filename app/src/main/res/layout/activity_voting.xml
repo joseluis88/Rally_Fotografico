@@ -12,7 +12,7 @@
         android:id="@+id/tvVotosRestantes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/votos_restantes_default"
+        android:text="@string/votos_restantes"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"

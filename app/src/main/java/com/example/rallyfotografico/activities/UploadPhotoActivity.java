@@ -21,6 +21,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.example.rallyfotografico.R;
 import com.example.rallyfotografico.services.FirebaseService;
@@ -40,6 +42,8 @@ public class UploadPhotoActivity extends AppCompatActivity {
     // Constantes
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CAMERA_PERMISSION = 101;
+    // NUEVO: Launcher para pedir permiso a la galería
+    private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
 
     // Parámetros de validación configurables
     private long maxFileSizeBytes = 5 * 1024 * 1024; // 5 MB por defecto
@@ -81,6 +85,18 @@ public class UploadPhotoActivity extends AppCompatActivity {
         btnSeleccionarFoto = findViewById(R.id.btnSeleccionarFoto);
         btnSubirFoto = findViewById(R.id.btnSubirFoto);
         btnQuitarFoto = findViewById(R.id.btnQuitarFoto);
+
+        // Registrar el launcher de permiso para galería
+        requestGalleryPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        openFileChooser();
+                    } else {
+                        Toast.makeText(this, "Permiso denegado para acceder a la galería", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
 
         loadConfiguration();         // Carga parámetros configurables desde Firestore
         loadSeudonimoUsuario();      // Carga el seudónimo del usuario actual

@@ -27,6 +27,7 @@
 
     <!-- Config_rally -->
     <string name="titulo_configuracion">Configuración del Rally</string>
+    <string name="titulo_inicio">Título de inicio</string>
     <string name="seccion_participantes">PARA PARTICIPANTES</string>
     <string name="hint_mensaje_participante">Mensaje motivacional</string>
     <string name="hint_tamano_maximo">Tamaño máximo en MB</string>
@@ -120,8 +121,11 @@
     <string name="validar_titulo">Validar Fotografías</string>
     <string name="validar_sin_fotos">No hay fotografías pendientes por validar</string>
 
+    <!-- Validar_Fotos_Adapter -->
+    <string name="validar_placeholder">Vista del adaptador no definida</string>
+
     <!-- Voting -->
-    <string name="votos_restantes_default">Votos restantes: 5</string>
+    <string name="votos_restantes">Votos restantes: %1$d</string>
 
     <!-- Item_Foto (Está en comun)-->
 

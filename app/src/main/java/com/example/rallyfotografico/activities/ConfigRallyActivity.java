@@ -32,7 +32,7 @@ public class ConfigRallyActivity extends AppCompatActivity {
 
     // Campos de entrada de datos
     private EditText etMensajeParticipante, etTamanoMaximo, etResolucion, etTipoImagen,
-            etFechaLimite, etLimiteFotos, etMensajePublico, etFechaInicioVotacion, etFechaFinVotacion, etTituloInicio;
+            etFechaLimite, etLimiteFotos, etMensajePublico, etFechaInicioVotacion, etFechaFinVotacion, etTituloInicio, etImagenInicio, etVotosPublico;
     private Button btnGuardarConfig, btnLimpiarCampos;
 
     // Formateador de fecha para entrada/salida
@@ -54,6 +54,7 @@ public class ConfigRallyActivity extends AppCompatActivity {
 
         // Referencias a los campos del layout
         etTituloInicio = findViewById(R.id.etTituloInicio);
+        etImagenInicio = findViewById(R.id.etImagenInicio);
         etMensajeParticipante = findViewById(R.id.etMensajeParticipante);
         etTamanoMaximo = findViewById(R.id.etTamanoMaximo);
         etResolucion = findViewById(R.id.etResolucion);
@@ -65,6 +66,8 @@ public class ConfigRallyActivity extends AppCompatActivity {
         etFechaFinVotacion = findViewById(R.id.etFechaFinVotacion);
         btnGuardarConfig = findViewById(R.id.btnGuardarConfig);
         btnLimpiarCampos = findViewById(R.id.btnLimpiarCampos);
+        etVotosPublico = findViewById(R.id.etVotosPublico);
+
 
         // Inicializa Firestore
         db = FirebaseFirestore.getInstance();
@@ -104,6 +107,7 @@ public class ConfigRallyActivity extends AppCompatActivity {
      */
     private void guardarConfiguracion() {
         String tituloInicio = etTituloInicio.getText().toString().trim();
+        String imagenInicio = etImagenInicio.getText().toString().trim();
         String mensajePart = etMensajeParticipante.getText().toString().trim();
         String tamano = etTamanoMaximo.getText().toString().trim();
         String resolucion = etResolucion.getText().toString().trim();
@@ -113,11 +117,12 @@ public class ConfigRallyActivity extends AppCompatActivity {
         String mensajePub = etMensajePublico.getText().toString().trim();
         String fechaInicioStr = etFechaInicioVotacion.getText().toString().trim();
         String fechaFinStr = etFechaFinVotacion.getText().toString().trim();
+        String votosPublicoStr = etVotosPublico.getText().toString().trim();
 
         // Validación de campos vacíos
-        if (TextUtils.isEmpty(tituloInicio) || TextUtils.isEmpty(mensajePart) || TextUtils.isEmpty(tamano) || TextUtils.isEmpty(resolucion) ||
+        if (TextUtils.isEmpty(tituloInicio) || TextUtils.isEmpty(imagenInicio) || TextUtils.isEmpty(mensajePart) || TextUtils.isEmpty(tamano) || TextUtils.isEmpty(resolucion) ||
                 TextUtils.isEmpty(tipo) || TextUtils.isEmpty(fechaLimiteStr) || TextUtils.isEmpty(limiteFotosStr) ||
-                TextUtils.isEmpty(mensajePub) || TextUtils.isEmpty(fechaInicioStr) || TextUtils.isEmpty(fechaFinStr)) {
+                TextUtils.isEmpty(mensajePub) || TextUtils.isEmpty(fechaInicioStr) || TextUtils.isEmpty(fechaFinStr) || TextUtils.isEmpty(votosPublicoStr)) {
             Toast.makeText(this, "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -141,10 +146,12 @@ public class ConfigRallyActivity extends AppCompatActivity {
             // Conversión numérica
             double tamanoMB = Double.parseDouble(tamano);
             int limiteFotos = Integer.parseInt(limiteFotosStr);
+            int votosPublico = Integer.parseInt(votosPublicoStr);
 
             // Creación de objeto con datos a guardar
             Map<String, Object> datos = new HashMap<>();
             datos.put("tituloInicio", tituloInicio);
+            datos.put("imagenInicio", imagenInicio);
             datos.put("mensajeParticipantes", mensajePart);
             datos.put("tamañoMaximoMB", tamanoMB);
             datos.put("resolucion", resolucion);
@@ -154,6 +161,7 @@ public class ConfigRallyActivity extends AppCompatActivity {
             datos.put("mensajePublico", mensajePub);
             datos.put("fechaInicioVotacion", fechaInicioStr);
             datos.put("fechaFinVotacion", fechaFinStr);
+            datos.put("votosPublico", votosPublico);
 
             // Guardar en Firestore
             configRef.set(datos).addOnSuccessListener(unused -> {
@@ -176,7 +184,10 @@ public class ConfigRallyActivity extends AppCompatActivity {
         configRef.get().addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 setTextoSiExiste(snapshot.getString("tituloInicio"), etTituloInicio);
+                setTextoSiExiste(snapshot.getString("imagenInicio"), etImagenInicio);
                 setTextoSiExiste(snapshot.getString("mensajeParticipantes"), etMensajeParticipante);
+                setTextoSiExiste(snapshot.getString("mensajeParticipantes"), etMensajeParticipante);
+
 
                 Double tamanoMB = snapshot.getDouble("tamañoMaximoMB");
                 if (tamanoMB != null) etTamanoMaximo.setText(String.valueOf(tamanoMB));
@@ -191,6 +202,9 @@ public class ConfigRallyActivity extends AppCompatActivity {
                 setTextoSiExiste(snapshot.getString("mensajePublico"), etMensajePublico);
                 setTextoSiExiste(snapshot.getString("fechaInicioVotacion"), etFechaInicioVotacion);
                 setTextoSiExiste(snapshot.getString("fechaFinVotacion"), etFechaFinVotacion);
+
+                Long votosPublico = snapshot.getLong("votosPublico");
+                if (votosPublico != null) etVotosPublico.setText(String.valueOf(votosPublico));
 
                 verificarCamposParaMostrarBotonLimpiar();
             }
@@ -219,7 +233,8 @@ public class ConfigRallyActivity extends AppCompatActivity {
                 !etLimiteFotos.getText().toString().isEmpty() ||
                 !etMensajePublico.getText().toString().isEmpty() ||
                 !etFechaInicioVotacion.getText().toString().isEmpty() ||
-                !etFechaFinVotacion.getText().toString().isEmpty()) {
+                !etFechaFinVotacion.getText().toString().isEmpty() ||
+                !etVotosPublico.getText().toString().isEmpty()) {
             btnLimpiarCampos.setVisibility(View.VISIBLE);
         } else {
             btnLimpiarCampos.setVisibility(View.GONE);
@@ -240,6 +255,7 @@ public class ConfigRallyActivity extends AppCompatActivity {
         etMensajePublico.setText("");
         etFechaInicioVotacion.setText("");
         etFechaFinVotacion.setText("");
+        etVotosPublico.setText("");
         btnLimpiarCampos.setVisibility(View.GONE);
     }
 }

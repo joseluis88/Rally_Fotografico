@@ -24,11 +24,10 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- NUEVO: Campo para título de inicio -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Título de inicio"
+            android:text="@string/titulo_inicio"
             android:paddingTop="12dp"
             android:textStyle="bold" />
 
@@ -39,6 +38,17 @@
             android:layout_marginTop="8dp"
             android:hint="Ej: Bienvenido al Rally Fotográfico"
             android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etImagenInicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Ej: Enlace foto portada"
+            android:inputType="text"
+            android:focusable="false"
+            android:longClickable="true"
+            android:textIsSelectable="true" />
 
         <!-- PARTICIPANTES -->
         <TextView
@@ -132,6 +142,22 @@
             android:clickable="true"
             android:focusable="false"
             android:hint="@string/hint_fecha_fin_votacion" />
+
+        <!-- Número de votos del público -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="Votos por usuario del público"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etVotosPublico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Ej: 3"
+            android:inputType="number" />
 
         <!-- BOTONES -->
         <Button

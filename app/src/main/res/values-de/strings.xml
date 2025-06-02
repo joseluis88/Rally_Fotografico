@@ -24,6 +24,7 @@
 
     <!-- Config_rally -->
     <string name="titulo_configuracion">Rally-Konfiguration</string>
+    <string name="titulo_inicio">Starttitel</string>
     <string name="seccion_participantes">FÜR TEILNEHMER</string>
     <string name="hint_mensaje_participante">Motivationsnachricht</string>
     <string name="hint_tamano_maximo">Maximale Größe in MB</string>
@@ -121,7 +122,7 @@
     <string name="validar_placeholder">Adapteransicht nicht definiert</string>
 
     <!-- Voting -->
-    <string name="votos_restantes_default">Verbleibende Stimmen: 5</string>
+    <string name="votos_restantes">Verbleibende Stimmen: %1$d</string>
 
     <!-- Item_Usuario -->
     <string name="usuario_nombre">Name</string>

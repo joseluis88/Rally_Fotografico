@@ -94,8 +94,10 @@ public class VotingActivity extends AppCompatActivity {
                                 finish();
                                 return;
                             } else {
-                                // Dentro del rango: verificar votos y cargar fotos
-                                checkVotosRestantes();
+                                // Dentro del rango: obtener votos permitidos, verificar votos y cargar fotos
+                                Long maxVotos = snapshot.getLong("votosPublico");
+                                int votosPermitidos = (maxVotos != null) ? maxVotos.intValue() : 5;
+                                checkVotosRestantes(votosPermitidos);
                                 loadVotingPhotos();
                             }
 
@@ -114,7 +116,7 @@ public class VotingActivity extends AppCompatActivity {
     /**
      * Verifica cuántas veces ha votado el dispositivo y actualiza el número de votos restantes.
      */
-    private void checkVotosRestantes() {
+    private void checkVotosRestantes(int maxVotos) {
         db.collection("fotos")
                 .whereEqualTo("estado", "admitida")
                 .get()
@@ -126,8 +128,8 @@ public class VotingActivity extends AppCompatActivity {
                             votosHechos++;
                         }
                     }
-                    votosRestantes = Math.max(0, 5 - votosHechos);
-                    tvVotosRestantes.setText("Votos restantes: " + votosRestantes);
+                    votosRestantes = Math.max(0, maxVotos - votosHechos);
+                    tvVotosRestantes.setText(getString(R.string.votos_restantes, votosRestantes));
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Error al cargar votos", Toast.LENGTH_SHORT).show());
     }
@@ -179,7 +181,7 @@ public class VotingActivity extends AppCompatActivity {
                                         "votantes", FieldValue.arrayUnion(deviceId))
                                 .addOnSuccessListener(aVoid -> {
                                     votosRestantes--;
-                                    tvVotosRestantes.setText("Votos restantes: " + votosRestantes);
+                                    tvVotosRestantes.setText(getString(R.string.votos_restantes, votosRestantes));
                                     Toast.makeText(VotingActivity.this, "Voto emitido", Toast.LENGTH_SHORT).show();
                                     loadVotingPhotos(); // Actualiza lista para reflejar el voto
                                 })
